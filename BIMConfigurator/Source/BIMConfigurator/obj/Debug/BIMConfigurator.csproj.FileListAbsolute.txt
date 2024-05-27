@@ -1,0 +1,5 @@
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIMConfigurator\AddIn\BIMConfigurator.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIMConfigurator\AddIn\BIMConfigurator.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIMConfigurator\Source\BIMConfigurator\obj\Debug\BIMConfigurator.csprojResolveAssemblyReference.cache
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIMConfigurator\Source\BIMConfigurator\obj\Debug\BIMConfigurator.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIMConfigurator\Source\BIMConfigurator\obj\Debug\BIMConfigurator.pdb

@@ -1,0 +1,5 @@
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SystemAnalysis\AddIn\SystemAnalysis.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SystemAnalysis\AddIn\SystemAnalysis.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SystemAnalysis\Source\SystemAnalysis\obj\Debug\SystemAnalysis.csprojResolveAssemblyReference.cache
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SystemAnalysis\Source\SystemAnalysis\obj\Debug\SystemAnalysis.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SystemAnalysis\Source\SystemAnalysis\obj\Debug\SystemAnalysis.pdb

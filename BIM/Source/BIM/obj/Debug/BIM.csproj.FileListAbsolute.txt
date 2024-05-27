@@ -1,0 +1,5 @@
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIM\AddIn\BIM.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIM\AddIn\BIM.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIM\Source\BIM\obj\Debug\BIM.csprojResolveAssemblyReference.cache
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIM\Source\BIM\obj\Debug\BIM.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\BIM\Source\BIM\obj\Debug\BIM.pdb

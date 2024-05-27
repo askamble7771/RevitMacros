@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+# SharpDevelop 4.2.0.8811-chenxu/REVIT-198440
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Khagesh2", "Khagesh2\Khagesh2.csproj", "{CCF1374B-B92B-4951-8D94-1C9EA51EF1A9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CCF1374B-B92B-4951-8D94-1C9EA51EF1A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCF1374B-B92B-4951-8D94-1C9EA51EF1A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCF1374B-B92B-4951-8D94-1C9EA51EF1A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCF1374B-B92B-4951-8D94-1C9EA51EF1A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+EndGlobal

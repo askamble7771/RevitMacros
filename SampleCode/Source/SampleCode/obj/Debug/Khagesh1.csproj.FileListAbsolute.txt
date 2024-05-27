@@ -1,0 +1,5 @@
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SampleCode\Source\SampleCode\obj\Debug\Khagesh1.csprojResolveAssemblyReference.cache
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SampleCode\Addin\Khagesh1.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SampleCode\Addin\Khagesh1.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SampleCode\Source\SampleCode\obj\Debug\Khagesh1.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\SampleCode\Source\SampleCode\obj\Debug\Khagesh1.pdb

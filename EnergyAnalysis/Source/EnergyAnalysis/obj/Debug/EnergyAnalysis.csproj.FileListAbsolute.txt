@@ -1,0 +1,5 @@
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\EnergyAnalysis\AddIn\EnergyAnalysis.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\EnergyAnalysis\AddIn\EnergyAnalysis.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\EnergyAnalysis\Source\EnergyAnalysis\obj\Debug\EnergyAnalysis.csprojResolveAssemblyReference.cache
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\EnergyAnalysis\Source\EnergyAnalysis\obj\Debug\EnergyAnalysis.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\EnergyAnalysis\Source\EnergyAnalysis\obj\Debug\EnergyAnalysis.pdb
