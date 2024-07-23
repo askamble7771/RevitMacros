@@ -56,6 +56,7 @@ namespace BIMConfigurator
 		}
 		#endregion
 		
+		//I have changed the material or thickness of the components
 		public void ReadJSON()
 		{
 			Document doc = this.ActiveUIDocument.Document;
@@ -85,9 +86,9 @@ namespace BIMConfigurator
 				strucAsset.Lightweight = true;
 				
 				double inch0 = 0.0;
-					double inch1 = 0.1/12.0;
-					double inch2 = 2.0/12.0;
-					double inch625 = ((5.0/8.0)/12.0);
+				double inch1 = 0.1/12.0;
+				double inch2 = 2.0/12.0;
+				double inch625 = ((5.0/8.0)/12.0);
 
 				for (int i = 1; i <= layers.Count; i++) {
 					string layerName = "layer-"+i;
@@ -124,41 +125,41 @@ namespace BIMConfigurator
 						XYZ vertex2 = new XYZ(vertex2_x, vertex2_y, 0.0);
 						
 						WallType newWallType = wallType.Duplicate("NewWall"+ wallCount+"Floor"+i) as WallType;
-					
-					ElementId oldWallLayerMaterialId = wallType.GetCompoundStructure().GetLayers()[0].MaterialId;
-					
-					//exterior
-					CompoundStructureLayer extLayerFinish1a = new CompoundStructureLayer(inch1, MaterialFunctionAssignment.Finish1, oldWallLayerMaterialId);
+						
+						ElementId oldWallLayerMaterialId = wallType.GetCompoundStructure().GetLayers()[0].MaterialId;
+						
+						//exterior
+						CompoundStructureLayer extLayerFinish1a = new CompoundStructureLayer(inch1, MaterialFunctionAssignment.Finish1, oldWallLayerMaterialId);
 //					CompoundStructureLayer extLayerMembrane1a = new CompoundStructureLayer(inch0, MaterialFunctionAssignment.Membrane, oldWallLayerMaterialId);
-					CompoundStructureLayer extLayerSubstrate1a = new CompoundStructureLayer(inch625, MaterialFunctionAssignment.Substrate, oldWallLayerMaterialId);
-					
-					//interior
+						CompoundStructureLayer extLayerSubstrate1a = new CompoundStructureLayer(inch625, MaterialFunctionAssignment.Substrate, oldWallLayerMaterialId);
+						
+						//interior
 //					CompoundStructureLayer intLayerMembrane2a = new CompoundStructureLayer(inch0, MaterialFunctionAssignment.Membrane, oldWallLayerMaterialId);
-					CompoundStructureLayer intLayerFinish2a = new CompoundStructureLayer(inch2, MaterialFunctionAssignment.Finish2, oldWallLayerMaterialId);
-					
-					//Wall compound structure
-					CompoundStructure compoundStructure = newWallType.GetCompoundStructure();
-					
-					//add all individual layers to wall compound structure layer
-					IList<CompoundStructureLayer> layers1 = compoundStructure.GetLayers();
-					
-					//Set compund structure layers
-					layers1.Insert(0, extLayerFinish1a);
+						CompoundStructureLayer intLayerFinish2a = new CompoundStructureLayer(inch2, MaterialFunctionAssignment.Finish2, oldWallLayerMaterialId);
+						
+						//Wall compound structure
+						CompoundStructure compoundStructure = newWallType.GetCompoundStructure();
+						
+						//add all individual layers to wall compound structure layer
+						IList<CompoundStructureLayer> layers1 = compoundStructure.GetLayers();
+						
+						//Set compund structure layers
+						layers1.Insert(0, extLayerFinish1a);
 //					layers1.Insert(1, extLayerMembrane1a);
-					layers1.Insert(1, extLayerSubstrate1a);
+						layers1.Insert(1, extLayerSubstrate1a);
 //					layers1.Insert(3, intLayerMembrane2a);
-					layers1.Insert(3, intLayerFinish2a);
-					
-					compoundStructure.SetLayers(layers1);
+						layers1.Insert(3, intLayerFinish2a);
+						
+						compoundStructure.SetLayers(layers1);
 						
 						Wall wall= Wall.Create(doc, Line.CreateBound(vertex1, vertex2), newWallType.Id, level_Id, 10, 0, true, false);
 						
-//Code to create Termal Properties of the wall - changing
+						//Code to create Termal Properties of the wall - changing
 						ThermalProperties prop = wallType.ThermalProperties;
 						prop.Roughness = 6;
 						prop.Absorptance = 0.9;
 						
-//Set wall thickness - changing
+						//Set wall thickness - changing
 						compoundStructure.SetLayerWidth(2, wallThickness*0.0833333);//inches to feet
 						compoundStructure.StructuralMaterialIndex = 2;
 						
@@ -206,7 +207,7 @@ namespace BIMConfigurator
 							FamilyInstance windowInstance = doc.Create.NewFamilyInstance(location, symbolWindow,specificWall, level, StructuralType.NonStructural);
 							
 							
-//changing width of the window
+							//changing width of the window
 							Parameter widthParam = windowInstance.LookupParameter("width"); // Replace "Width" with the actual parameter name
 							
 							// Check if the parameter is valid
@@ -225,7 +226,7 @@ namespace BIMConfigurator
 							Wall specificWall = wallDictionary[lineName];
 							FamilyInstance doorInstance = doc.Create.NewFamilyInstance(location, symbolDoor, specificWall, level, StructuralType.NonStructural);
 
-// Set width of Door
+							// Set width of Door
 							Parameter doorWidthParameter = doorInstance.LookupParameter("Width");
 							if (doorWidthParameter != null)
 							{
@@ -256,7 +257,7 @@ namespace BIMConfigurator
 					profile.Append(Line.CreateBound(vertexList[2], vertexList[3]));
 					profile.Append(Line.CreateBound(vertexList[3], vertexList.First()));
 					
-//Starting to changing material
+					//Starting to changing material
 					FloorType newFloorType =  floorType.Duplicate("New Wall17a"+i) as FloorType;
 					CeilingType newCeilingType = ceilingType.Duplicate("New Wall17a"+i) as CeilingType;
 					
@@ -485,7 +486,7 @@ namespace BIMConfigurator
 				var materialList = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Materials).OfClass(typeof(FamilySymbol));
 				
 				List<string> materialType = new List<string>();
-				var countMaterial = 0; 
+				var countMaterial = 0;
 				foreach (var element in materialList) {
 					FamilySymbol famSym = element as FamilySymbol;
 					if(element != null){
@@ -658,7 +659,7 @@ namespace BIMConfigurator
 				double inch1 = 1.0/12.0;
 				double inch2 = 2.0/12.0;
 				double inch625 = ((5.0/8.0)/12.0);
-								
+				
 				//exterior
 				CompoundStructureLayer extLayerFinish1 = new CompoundStructureLayer(inch1, MaterialFunctionAssignment.Finish1, materialId);
 				CompoundStructureLayer extLayerMembrane1 = new CompoundStructureLayer(inch0, MaterialFunctionAssignment.Membrane, materialId);
@@ -774,7 +775,7 @@ namespace BIMConfigurator
 				string constructionName = fam.AnalyticConstructionName;
 				
 				FamilyInstance window = doc.Create.NewFamilyInstance(location, windowSymbol, wall, StructuralType.NonStructural);
-					
+				
 				transaction.Commit();
 			}
 		}
@@ -784,87 +785,245 @@ namespace BIMConfigurator
 			return "Hello World!!";
 		}
 		
+		private void DeleteElement(Autodesk.Revit.DB.Document document, Element element)
+		{
+			// Delete a selected element.
+			ICollection<Autodesk.Revit.DB.ElementId> deletedIdSet = document.Delete(element.Id);
+			
+			if (0 == deletedIdSet.Count)
+			{
+				throw new Exception("Deleting the selected element in Revit failed.");
+			}
+		}
 		
 		public void addLevel()
 		{
 			Document doc = this.ActiveUIDocument.Document;
 			using(Transaction trans = new Transaction(doc))
 			{
-				trans.Start("Creating level");
+				trans.Start("Creating new levels as per Json");
+				string fileName = "E:\\multi 1.json";
+				StreamReader streamReader = new StreamReader(fileName);
+				string json = streamReader.ReadToEnd();
+				streamReader.Close();
 				
-				// The elevation to apply to the new level
-			    double elevation = 30.0; 
-			
-			    // Begin to create a level
-			    Level level = Level.Create(doc, elevation);
-			    if (null == level)
-			    {
-			        throw new Exception("Create a new level failed.");
-			    }
-			
-			    // Change the level name
-			    level.Name = "New level";
+				JObject builderRoot = JsonConvert.DeserializeObject<JObject>(json);
+				var levels = builderRoot["siteProperties"]["Level"].ToObject<JObject>();
 				
-				
+				try{
+					foreach (var level in levels) {
+						var data = level.Value;
+						var item = level.Key;
+						
+						double elevation = data["Elevation"].ToObject<double>();
+						string name = item.ToString();
+						
+						// Begin to create a level
+						Level level1 = Level.Create(doc, elevation);
+						if (null == level1)
+						{
+							throw new Exception("Create a new level failed.");
+						}
+						
+						// Change the level name
+						level1.Name = "Level "+name;
+						
+						// Get a ViewFamilyType for creating a floor plan
+						ViewFamilyType viewFamilyType = null;
+						FilteredElementCollector collector = new FilteredElementCollector(doc);
+						foreach (Element e in collector.OfClass(typeof(ViewFamilyType)))
+						{
+							ViewFamilyType vft = e as ViewFamilyType;
+							if (vft.ViewFamily == ViewFamily.FloorPlan)
+							{
+								viewFamilyType = vft;
+								break;
+							}
+						}
+						
+						// Create a new view plan associated with the level
+						if (viewFamilyType != null)
+						{
+							ViewPlan viewPlan = ViewPlan.Create(doc, viewFamilyType.Id, level1.Id);
+							if (viewPlan == null)
+							{
+								throw new Exception("Failed to create view for the new level.");
+							}
+						}
+						else
+						{
+							throw new Exception("No ViewFamilyType found for creating a floor plan.");
+						}
+					}
+				}
+				catch(Exception ex){
+					TaskDialog.Show("Exception", ex.StackTrace);
+				}
 				trans.Commit();
 			}
-			
+		}
 		
+		public void DeleteLevels()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			using(Transaction tx = new Transaction(doc, "Delete Levels"))
+			{
+				tx.Start();
+				
+				int deleted = 0;
+				FilteredElementCollector collector = new FilteredElementCollector(doc);
+				ICollection<Element> levels = collector.OfClass(typeof(Level)).ToElements();
+				List<ElementId> elementsToBeDeleted = new List<ElementId>();
+				
+				foreach(Element element in levels)
+				{
+					elementsToBeDeleted.Add(element.Id);
+					deleted++;
+				}
+				doc.Delete(elementsToBeDeleted);
+				
+				tx.Commit();
+			}
+		}
+		
+		public void DeleteWindows()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			using(Transaction tx = new Transaction(doc, "Delete Levels"))
+			{
+				tx.Start();
+				
+				int deleted = 0;
+				FilteredElementCollector collector = new FilteredElementCollector(doc);
+				collector.OfCategory(BuiltInCategory.OST_Windows);
+				collector.WhereElementIsNotElementType(); // To get instances only
+				
+				// Use a set to collect unique family types
+				HashSet<ElementId> windowFamilyTypeIds = new HashSet<ElementId>();
+
+				foreach (Element window in collector)
+				{
+					// Get the type ID of the window instance
+					ElementId typeId = window.GetTypeId();
+					if (typeId != ElementId.InvalidElementId)
+					{
+						windowFamilyTypeIds.Add(typeId);
+					}
+				}
+
+				
+
+				foreach (ElementId typeId in windowFamilyTypeIds)
+				{
+					try
+					{
+						// Delete the family type
+						doc.Delete(typeId);
+						deleted++;
+					}
+					catch (Exception ex)
+					{
+						TaskDialog.Show("message", "Failed to delete family type with ID "+typeId + " - "+"message " +ex.Message);
+					}
+				}
+				
+				TaskDialog.Show("Result", "Windows deleted are "+deleted);
+				
+				
+			}
+			
+			
+			
+			
+			
+		}
+		
+		public void ChangeWallThickness()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			
+			using (Transaction transaction = new Transaction(doc, "WallCreation"))
+			{
+				transaction.Start("Create Wall");
+				
+				// Create a wall
+				WallType wallType = new FilteredElementCollector(doc).OfClass(typeof(WallType)).Cast<WallType>().FirstOrDefault();
+			
+				ElementId level_Id = Level.GetNearestLevelId(doc, 5.0);
+				Level level = doc.GetElement(level_Id) as Level;
+				
+				XYZ startPoint = new XYZ(0.0, 0.0, 0.0);
+				XYZ endPoint = new XYZ(25.0, 0.0, 0.0);
+
+				FilteredElementCollector collector = new FilteredElementCollector(doc);
+				
+				//Starting to aterial change
+				WallType newWallType =  wallType.Duplicate("New Wall17a") as WallType;
+			
+				//Wall compound structure
+				CompoundStructure compoundStructure = newWallType.GetCompoundStructure();
+				
+				//add all individual layers to wall compound structure layer
+				IList<CompoundStructureLayer> layers = compoundStructure.GetLayers();
+				
+				layers[0].Width = 4.0;
+				compoundStructure.SetLayers(layers);
+				
+				newWallType.SetCompoundStructure(compoundStructure);
+				Wall.Create(doc, Line.CreateBound(startPoint, endPoint), newWallType.Id, level_Id, 10, 0,false, true);
+				
+				transaction.Commit();
+			}
+		}
+		
+		public void AddDoors()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			
+			using (Transaction transaction = new Transaction(doc, "WallCreation"))
+			{
+				transaction.Start("Create Wall");
+				
+				// Get a floor type for floor creation
+				ElementId floorTypeId = Floor.GetDefaultFloorType(doc, false);
+				CurveLoop profile = new CurveLoop();
+				
+				// Create a wall
+				WallType wallType = new FilteredElementCollector(doc).OfClass(typeof(WallType)).Cast<WallType>().FirstOrDefault();
+				//Level level = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().FirstOrDefault();
+				ElementId levelId1 = Level.GetNearestLevelId(doc, 5.00);
+				
+				FilteredElementCollector doorFilter = new FilteredElementCollector(doc);
+				ICollection<Element> collection = doorFilter.OfClass(typeof(FamilySymbol))
+					.OfCategory(BuiltInCategory.OST_Doors)
+					.ToElements();
+				
+				IEnumerator<Element> iterator =  collection.GetEnumerator();
+				
+				Wall wall1 = Wall.Create(doc, Line.CreateBound(new XYZ(0.0, 0.0, 0.0),new XYZ(0.0, 50.0, 0.0)), wallType.Id, levelId1, 10, 0, true, false);
+				
+				// get wall's level for door creation
+				Level level = doc.GetElement(wall1.LevelId) as Level;
+				
+				FilteredElementCollector collector = new FilteredElementCollector(doc);
+				
+				double x = 0, y = 5.0, z = 0;
+				
+				FamilySymbol symbol = collector.OfCategory(BuiltInCategory.OST_Doors).OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>().FirstOrDefault();
+				
+				XYZ location = new XYZ(x, y, z);
+				FamilyInstance instance = doc.Create.NewFamilyInstance(location, symbol, wall1, level, StructuralType.NonStructural);
+				y += 5;
+
+				
+				
+				transaction.Commit();
+			}
+		}
+		
+		public void addAnalyticView()
+		{
+			
 		}
 	}
 }
-
-//				string materialName = "Fabric";
-//				ElementId materialId = new ElementId(BuiltInParameter.MATERIAL_AREA);
-//
-//				FilteredElementCollector collector = new FilteredElementCollector(doc);
-//				ICollection<Element> materials = collector.OfClass(typeof(Material)).ToElements();
-//
-//
-//				foreach (Element element in materials)
-//				{
-//					Material material = element as Material;
-//					if (material != null && material.Name == materialName)
-//					{
-//						// Found the material with the specified name
-//						materialId = material.Id;
-//						// Now 'materialId' holds the ID of the material with the specified name
-//						break; // Exit the loop once the material is found
-//					}
-//				}
-//
-//				Material wallMaterial = doc.GetElement(materialId) as Material;
-//
-//				string newName = "new" + wallMaterial.Name;
-//				Material myMaterial = wallMaterial.Duplicate(newName);
-//
-//				//   					ElementId materialId = wallMaterial.Id;
-////
-////		            // Set the material parameter of the wall
-////		            Parameter materialParameter = wall.get_Parameter(BuiltInParameter.WALL_STRUCTURAL_MATERIAL_PARAM);
-//
-//
-//
-//				//						Parameter parameter = wall.get_Parameter(BuiltInParameter.MATERIAL_ID_PARAM);
-////						ForgeTypeId forge = new ForgeTypeId("");
-//
-//				Parameter parameter = wall.get_Parameter(BuiltInParameter.WALL_STRUCTURE_ID_PARAM);
-//
-//				if (parameter != null && wallMaterial != null)
-//				{
-//					parameter.Set(wallMaterial.Id);
-//					TaskDialog.Show("Success", "Material successfully assigned to the wall.");
-//				}
-//
-////						TaskDialog.Show("result" , materialName);
-
-
-
-
-//				//Assign the property set to the material.
-//				PropertySetElement pse = PropertySetElement.Create(doc, strucAsset);
-//				material.SetMaterialAspectByPropertySet(MaterialAspect.Structural, pse.Id);
-
-//				ElementId elemTypeId = wall.GetTypeId();
-//				ElementType elemType = (ElementType)doc.GetElement(elemTypeId);
-//	            elemType.LookupParameter("Material").Set(materialId);

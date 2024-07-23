@@ -19,8 +19,8 @@
     <OutputPath>..\..\Addin\</OutputPath>
     <AssemblyName>Khagesh2</AssemblyName>
     <BaseInterMediateOutputPath>obj\</BaseInterMediateOutputPath>
-    <InterMediateOutputPath>obj\Debug</InterMediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <InterMediateOutputPath>obj\Debug</InterMediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>

@@ -1,0 +1,5 @@
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\RevitViewSet\AddIn\RevitViewSet.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\RevitViewSet\AddIn\RevitViewSet.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\RevitViewSet\Source\RevitViewSet\obj\Debug\RevitViewSet.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\RevitViewSet\Source\RevitViewSet\obj\Debug\RevitViewSet.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\RevitViewSet\Source\RevitViewSet\obj\Debug\RevitViewSet.csprojResolveAssemblyReference.cache

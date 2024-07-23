@@ -63,24 +63,19 @@ namespace wallCreate
 					.Cast<WallType>()
 					.FirstOrDefault();
 				
-				Level level = new FilteredElementCollector(doc)
-					.OfClass(typeof(Level))
-					.Cast<Level>()
-					.FirstOrDefault();
+				ElementId levelId = Level.GetNearestLevelId(doc, 3);
 				
-				if (wallType != null && level != null)
+				if (wallType != null)
 				{
-					Wall wall = Wall.Create(doc, line, wallType.Id, level.Id, 10, 0, true, false);
+					Wall wall = Wall.Create(doc, line, wallType.Id, levelId, 10, 0, true, false);
 					if (wall != null)
 					{
 						
 						TaskDialog.Show("Success", "Wall created successfully.");
 					}
 				}
-				
-//				transaction.RollBack();
+			
 				transaction.Commit();
-//				TaskDialog.Show("Error", "Failed to create wall.");
 			}
 		}
 
@@ -93,8 +88,6 @@ namespace wallCreate
 				trans.Start("Creating ceiling");
 				try
 				{
-					
-					
 					IEnumerable<Space> spaces = new FilteredElementCollector(doc, doc.ActiveView.Id)
 						.WhereElementIsNotElementType()
 						.OfCategory(BuiltInCategory.OST_MEPSpaces)
@@ -175,7 +168,8 @@ namespace wallCreate
 			
 		}
 		
-		public void SetRoomLimitOffset()//Code of add ceiling
+		//To set the RoomLimitOffset to height of room. Otherwise it will give error to perform RSA
+		public void SetRoomLimitOffset()
 		{
 			
 			Document doc = this.ActiveUIDocument.Document;
@@ -237,6 +231,7 @@ namespace wallCreate
 			}
 			
 		}
+		
 		public void addRoofs()
 		{
 			Document doc = this.ActiveUIDocument.Document;
@@ -246,8 +241,6 @@ namespace wallCreate
 				trans.Start("Creating ceiling");
 				try
 				{
-					
-					
 					IEnumerable<Space> spaces = new FilteredElementCollector(doc, doc.ActiveView.Id)
 						.WhereElementIsNotElementType()
 						.OfCategory(BuiltInCategory.OST_MEPSpaces)
@@ -323,7 +316,9 @@ namespace wallCreate
 				trans.Commit();
 			}
 		}
-		public void CreateMultiFloor()
+		
+		//Two building created with hardcoded values
+		public void CreateTwoBuildings()
 		{
 			Document doc = this.ActiveUIDocument.Document;
 			
@@ -482,12 +477,15 @@ namespace wallCreate
 				instanceWindow = doc.Create.NewFamilyInstance(new XYZ(0, 10, 13), symbolWindow, wall6a, level, StructuralType.NonStructural);
 				instanceWindow = doc.Create.NewFamilyInstance(new XYZ(0, 20, 13), symbolWindow, wall6a, level, StructuralType.NonStructural);
 				
+				
+				
 				transaction.Commit();
 			}
 			
 			
 		}
 		
+		//Doors given in h and w dimensions in list and created with seperate family names and given dimensions
 		public void AddDoors()
 		{
 			Document doc = this.ActiveUIDocument.Document;
@@ -496,19 +494,19 @@ namespace wallCreate
 			{
 				transaction.Start("Create Wall");
 				
+				List<double> width = new List<double>(){2.55555555, 4.5, 2.55555555};
+				List<double> height = new List<double>(){6.0122, 8.66666666, 6.0122};
+				
 				// Get a floor type for floor creation
 				ElementId floorTypeId = Floor.GetDefaultFloorType(doc, false);
 				CurveLoop profile = new CurveLoop();
 				
 				// Create a wall
 				WallType wallType = new FilteredElementCollector(doc).OfClass(typeof(WallType)).Cast<WallType>().FirstOrDefault();
-				//Level level = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().FirstOrDefault();
 				ElementId levelId1 = Level.GetNearestLevelId(doc, 5.00);
 				
 				FilteredElementCollector doorFilter = new FilteredElementCollector(doc);
-				ICollection<Element> collection = doorFilter.OfClass(typeof(FamilySymbol))
-					.OfCategory(BuiltInCategory.OST_Doors)
-					.ToElements();
+				ICollection<Element> collection = doorFilter.OfClass(typeof(FamilySymbol)).OfCategory(BuiltInCategory.OST_Doors).ToElements();
 				
 				IEnumerator<Element> iterator =  collection.GetEnumerator();
 				
@@ -517,27 +515,97 @@ namespace wallCreate
 				// get wall's level for door creation
 				Level level = doc.GetElement(wall1.LevelId) as Level;
 				
-				FilteredElementCollector collector = new FilteredElementCollector(doc);
-
-				double x = 0, y = 5.0, z = 0;
 				
+				
+				double x = 0, y = 5.0, z = 0;
+				FilteredElementCollector collector = new FilteredElementCollector(doc);
 				FamilySymbol symbol = collector.OfCategory(BuiltInCategory.OST_Doors).OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>().FirstOrDefault();
 				
-				XYZ location = new XYZ(x, y, z);
-				FamilyInstance instance = doc.Create.NewFamilyInstance(location, symbol, wall1, level, StructuralType.NonStructural);
-				y += 5;
-
+				FamilySymbol symbol1 = null;
+//				collector.OfCategory(BuiltInCategory.OST_Doors).OfClass(typeof(FamilySymbol)).Cast<FamilySymbol>();
+				double width1 = Math.Round(width[0], 2);
+				double height1 = Math.Round(height[0], 2);
+				string name1 = "Width"+ width1+" X "+ "Height"+height1;
 				
+				symbol1 = collector.FirstOrDefault(ashish => ashish.Name.Equals( name1 )) as FamilySymbol;
+				
+				if (symbol1 == null)
+				{
+				    symbol1 = symbol.Duplicate(name1) as FamilySymbol;
+				}
+				
+				
+				if (!symbol1.IsActive)
+				{
+					symbol1.Activate();
+					doc.Regenerate();
+				}
+				
+				// Set the height and width of the door
+				Parameter heightParam = symbol1.LookupParameter("Height");
+				Parameter widthParam = symbol1.LookupParameter("Width");
+				
+				if (heightParam != null && heightParam.IsReadOnly == false)
+				{
+					heightParam.Set(height1); // Set desired height in meters or feet based on the document's unit settings
+				}
+				
+				if (widthParam != null && widthParam.IsReadOnly == false)
+				{
+					widthParam.Set(width1); // Set desired width in meters or feet based on the document's unit settings
+				}
+				
+				width1 = Math.Round(width[2], 2);
+				height1 = Math.Round(height[2], 2);
+				string name2 = "Width"+ width1+" X "+ "Height"+height1;
+				
+				// Assuming 'document' is an instance of the Revit document
+//				FamilySymbol existingSymbol = document.GetFamilySymbols().FirstOrDefault(s => s.Name == name2);
+				
+				FamilySymbol symbol2 = null;
+				symbol2 = collector.FirstOrDefault(ashish => ashish.Name.Equals( name2 )) as FamilySymbol;
+				
+				if (symbol2 == null)
+				{
+				    symbol2 = symbol.Duplicate(name2) as FamilySymbol;
+				}
+				
+				if (!symbol2.IsActive)
+				{
+					symbol2.Activate();
+					doc.Regenerate();
+				}
+				
+				// Set the height and width of the door
+				heightParam = symbol2.LookupParameter("Height");
+				widthParam = symbol2.LookupParameter("Width");
+				
+				
+				if (heightParam != null && heightParam.IsReadOnly == false)
+				{
+					heightParam.Set(height1); // Set desired height in meters or feet based on the document's unit settings
+				}
+				
+				if (widthParam != null && widthParam.IsReadOnly == false)
+				{
+					widthParam.Set(width1); // Set desired width in meters or feet based on the document's unit settings
+				}
+							
+				XYZ location = new XYZ(x, y, z);
+				XYZ location1 = new XYZ(x, y+5, z);
+				FamilyInstance instance = doc.Create.NewFamilyInstance(location, symbol1, wall1, level, StructuralType.NonStructural);
+				FamilyInstance instance1 = doc.Create.NewFamilyInstance(location1, symbol2, wall1, level, StructuralType.NonStructural);
 				
 				transaction.Commit();
 			}
 		}
 		
+		//Initial project to read JSON and create building
 		public void ReadJsonFile()
 		{
 			Document doc = this.ActiveUIDocument.Document;
 			
-			using(Transaction trans = new Transaction(doc, "wallCreation")){
+			using(Transaction trans = new Transaction(doc, "Building Creation")){
 				trans.Start("Creating wall in Revit");
 				string fileName = "E:\\multiFloorBuilding.json";
 				StreamReader streamReader = new StreamReader(fileName);
@@ -636,7 +704,7 @@ namespace wallCreate
 							}
 							
 						}
-						else if (data["type"].ToString() == "double door") {							
+						else if (data["type"].ToString() == "double door") {
 							// Filter for double doors
 							FilteredElementCollector collectorDoor = new FilteredElementCollector(doc);
 							FamilySymbol symbolDoor = collectorDoor
@@ -696,8 +764,317 @@ namespace wallCreate
 				trans.Commit();
 			}
 		}
-//		public void BIMConfigurator()
-//		{
-//		}
+		
+		//creating room tags
+		public void twoRoomTags()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			
+			using (Transaction transaction = new Transaction(doc, "WallCreation"))
+			{
+				transaction.Start("Create Wall");
+				List<XYZ> pointList = new List<XYZ>();
+				List<XYZ> pointList1 = new List<XYZ>();
+				
+				// Getting the points for vertices of the wall
+				pointList.Add(new XYZ(0, 0, 0));
+				pointList.Add(new XYZ(30, 0, 0));
+				pointList.Add(new XYZ(30, 30, 0));
+				pointList.Add(new XYZ(0, 30, 0));
+				
+				pointList.Add(new XYZ(30, 30, 0));
+				pointList.Add(new XYZ(30, 60, 0));
+				pointList.Add(new XYZ(0, 60, 0));
+				pointList.Add(new XYZ(0, 30, 0));
+				
+				// Create a wall
+				WallType wallType = new FilteredElementCollector(doc).OfClass(typeof(WallType)).Cast<WallType>().FirstOrDefault();
+				ElementId level1_Id = Level.GetNearestLevelId(doc, 5.00);
+				
+				Level level = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().FirstOrDefault();
+				
+				Wall wall1 = Wall.Create(doc, Line.CreateBound(pointList[0], pointList[1]), wallType.Id, level1_Id, 10, 0, true, false);
+				Wall wall2 = Wall.Create(doc, Line.CreateBound(pointList[1], pointList[5]), wallType.Id, level1_Id, 10, 0, true, false);
+				Wall wall3 = Wall.Create(doc, Line.CreateBound(pointList[2], pointList[3]), wallType.Id, level1_Id, 10, 0, true, false);
+				Wall wall4 = Wall.Create(doc, Line.CreateBound(pointList[3], pointList[0]), wallType.Id, level1_Id, 10, 0, true, false);
+				
+//				Wall wall5 = Wall.Create(doc, Line.CreateBound(pointList[4], pointList[5]), wallType.Id, level1_Id, 10, 0, true, false);
+				Wall wall6 = Wall.Create(doc, Line.CreateBound(pointList[5], pointList[6]), wallType.Id, level1_Id, 10, 0, true, false);
+				Wall wall7 = Wall.Create(doc, Line.CreateBound(pointList[6], pointList[2]), wallType.Id, level1_Id, 10, 0, true, false);
+				
+				UV midpoint1 = new UV(15, 15);
+				UV midpoint2 = new UV(20, 50);
+				
+				addRoomTags(doc, level1_Id, midpoint1, midpoint2);
+				
+				transaction.Commit();
+			}			
+		}
+		
+		//function for twoRoomTags()
+		public void addRoomTags(Document doc, ElementId levelId, UV midpoint1, UV midpoint2)
+		{
+			Element element = doc.GetElement(levelId);
+			Level level = element as Level;
+			
+			ViewPlan view = GetViewForLevel(doc, level);
+
+			Room room1 = doc.Create.NewRoom(level, midpoint1);
+			RoomTag roomTag1 = doc.Create.NewRoomTag(new LinkElementId(room1.Id), midpoint1, view.Id);
+			
+			
+			Room room2 = doc.Create.NewRoom(level, midpoint2);
+			RoomTag roomTag2 = doc.Create.NewRoomTag(new LinkElementId(room2.Id), midpoint2, view.Id);
+		}
+		
+		public ViewPlan GetViewForLevel(Document document, Level level)
+		{
+			FilteredElementCollector collector = new FilteredElementCollector(document);
+			ICollection<Element> views = collector.OfClass(typeof(ViewPlan)).ToElements();
+			foreach (Element elem in views)
+			{
+				ViewPlan view = elem as ViewPlan;
+				if (view != null && view.Name == "Level 1" && view.ViewType.ToString() == "FloorPlan")
+				{
+					return view;
+				}
+			}
+			
+			return null;
+		}
+		
+		//Roof openings are added to roof at the top of building
+		public void AddRoofOpening()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			
+			FilteredElementCollector collector = new FilteredElementCollector(doc);
+			collector.OfCategory(BuiltInCategory.OST_Levels);
+			collector.OfClass(typeof(Level));
+			Level level = collector.ToElements().Cast<Level>().ToList<Level>().First();
+
+			RoofType roofType = new FilteredElementCollector(doc).OfClass(typeof(RoofType)).FirstOrDefault<Element>() as RoofType;
+
+			List<XYZ> roofProfilePts = new List<XYZ>() {
+				new XYZ(0, 0, 0),
+				new XYZ(18, 0, 0),
+				new XYZ(18, 9, 0),
+				new XYZ(0, 9, 0) };
+
+			List<Line> roofLines = new List<Line>() {
+				Line.CreateBound(roofProfilePts[0], roofProfilePts[1]),
+				Line.CreateBound(roofProfilePts[1], roofProfilePts[2]),
+				Line.CreateBound(roofProfilePts[2], roofProfilePts[3]),
+				Line.CreateBound(roofProfilePts[3], roofProfilePts[0])};
+			
+			// Create a CurveLoop from the roofLines
+			CurveLoop roofCurveLoop = new CurveLoop();
+			foreach (var line in roofLines)
+			{
+				roofCurveLoop.Append(line);
+			}
+
+			//Opening drawing in the slope
+			List<XYZ> openingBasePts = new List<XYZ>() {
+				new XYZ(6, 3, 0),
+				new XYZ(12, 3, 0),
+				new XYZ(12, 6, 0),
+				new XYZ(6, 6, 0) };
+
+
+			using (Transaction tx = new Transaction(doc, "Creating model lines for roof and opening on base"))
+			{
+				tx.Start();
+
+				Plane plane = Plane.CreateByNormalAndOrigin(new XYZ(0, 0, 1), new XYZ(0, 0, level.Elevation));
+				SketchPlane sketchPlane = SketchPlane.Create(doc, plane);
+
+				//Roof model lines
+				foreach (var line in roofLines)
+					doc.Create.NewModelCurve(line, sketchPlane);
+
+				//Opening model lines in the base level
+				doc.Create.NewModelCurve(Line.CreateBound(openingBasePts[0], openingBasePts[1]), sketchPlane);
+				doc.Create.NewModelCurve(Line.CreateBound(openingBasePts[1], openingBasePts[2]), sketchPlane);
+				doc.Create.NewModelCurve(Line.CreateBound(openingBasePts[2], openingBasePts[3]), sketchPlane);
+				doc.Create.NewModelCurve(Line.CreateBound(openingBasePts[3], openingBasePts[0]), sketchPlane);
+
+				tx.Commit();
+			}
+			
+			RoofBase roof = null;
+			Ceiling ceiling = null;
+			using (Transaction tx = new Transaction(doc, "Creating roof"))
+			{
+				tx.Start();
+				try
+				{
+					CurveArray roofProfile = doc.Application.Create.NewCurveArray();
+					foreach (var line in roofLines)
+						roofProfile.Append(line);
+
+					ModelCurveArray footPrintToModelCurveMapping = new ModelCurveArray();
+					var footprintRoof = doc.Create.NewFootPrintRoof(roofProfile, level, roofType, out footPrintToModelCurveMapping);
+
+					var iterator = footPrintToModelCurveMapping.ForwardIterator();
+					iterator.Reset();
+					ModelCurve modelCurveBase = null;
+					var baseLine = Line.CreateBound(roofProfilePts[0], roofProfilePts[1]);
+
+					while (iterator.MoveNext())
+					{
+						ModelCurve modelCurve = iterator.Current as ModelCurve;
+						if (modelCurve == null) continue;
+
+						var pt1 = modelCurve.GeometryCurve.GetEndPoint(0);
+						var pt2 = modelCurve.GeometryCurve.GetEndPoint(1);
+
+						if (pt1.IsAlmostEqualTo(roofProfilePts[0], doc.Application.ShortCurveTolerance) && pt2.IsAlmostEqualTo(roofProfilePts[1], doc.Application.ShortCurveTolerance))
+							modelCurveBase = modelCurve;
+					}
+
+					//Sets the slope in the model line selected
+//					footprintRoof.set_DefinesSlope(modelCurveBase, true);
+//					footprintRoof.set_SlopeAngle(modelCurveBase, Math.PI / 6);
+//					doc.Regenerate();
+
+					roof = footprintRoof as RoofBase;
+					
+					ceiling = Ceiling.Create(doc, new List<CurveLoop> { roofCurveLoop }, ElementId.InvalidElementId, level.Id);
+
+				}
+				catch (Exception ex)
+				{
+					TaskDialog.Show(ex.Message, "Error");
+				}
+
+				tx.Commit();
+			}
+			
+			var roofTopFaceRef = HostObjectUtils.GetTopFaces(roof).First();
+
+			var hostGeometryObject = roof.GetGeometryObjectFromReference(roofTopFaceRef);
+			var roofTopFace = hostGeometryObject as PlanarFace;
+			List<XYZ> openingProfilePts = new List<XYZ>();
+
+			foreach (var pt in openingBasePts)
+				openingProfilePts.Add(roofTopFace.Project(pt).XYZPoint);
+
+			List<Line> openingLines = new List<Line>() {
+				Line.CreateBound(openingProfilePts[0], openingProfilePts[1]),
+				Line.CreateBound(openingProfilePts[1], openingProfilePts[2]),
+				Line.CreateBound(openingProfilePts[2], openingProfilePts[3]),
+				Line.CreateBound(openingProfilePts[3], openingProfilePts[0])};
+
+			using (Transaction tx = new Transaction(doc, "Creating model lines for opening on face"))
+			{
+				tx.Start();
+
+				SketchPlane sketchPlane = SketchPlane.Create(doc, roofTopFaceRef);
+
+				//Opening model lines
+				foreach (var line in openingLines)
+					doc.Create.NewModelCurve(line, sketchPlane);
+
+				tx.Commit();
+			}
+
+			using (Transaction tx = new Transaction(doc, "Creating opening"))
+			{
+				tx.Start();
+				try
+				{
+					CurveArray openingProfile = doc.Application.Create.NewCurveArray();
+					foreach (var line in openingLines)
+						openingProfile.Append(line);
+
+					var op2 = doc.Create.NewOpening(ceiling, openingProfile, true);
+					var op3 = doc.Create.NewOpening(roof, openingProfile, false);
+
+				}
+				catch (Exception ex)
+				{
+					TaskDialog.Show(ex.Message, "Error");
+				}
+
+				tx.Commit();
+			}
+		}
+		
+		//CreateWallWithNormals
+		public void CreateWallWithNormals()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			
+			using (Transaction transaction = new Transaction(doc, "WallCreation"))
+			{
+				transaction.Start("Create Wall");
+
+				// Build a wall profile for the wall creation
+				XYZ first = new XYZ(0, 0, 0);
+				XYZ second = new XYZ(20, 0, 0);
+				XYZ third = new XYZ(20, 0, 30);
+				XYZ fourth = new XYZ(0, 0, 30);
+				IList<Curve> profile = new List<Curve>();
+
+				profile.Add(Line.CreateBound(first, second));
+				profile.Add(Line.CreateBound(second, third));
+				profile.Add(Line.CreateBound(third, fourth));
+				profile.Add(Line.CreateBound(fourth, first));
+
+				XYZ normal = new XYZ(0, 1, 0);
+
+				WallType wallType = new FilteredElementCollector(doc)
+					.OfClass(typeof(WallType))
+					.Cast<WallType>()
+					.FirstOrDefault();
+				
+				Level level = new FilteredElementCollector(doc)
+					.OfClass(typeof(Level))
+					.Cast<Level>()
+					.FirstOrDefault();
+				
+				// Create a wall
+				Wall wall = Wall.Create(doc, profile, wallType.Id, level.Id, true, normal);
+				
+				FilteredElementCollector collector = new FilteredElementCollector(doc);
+				ICollection<ElementId> wallIds = collector.OfClass(typeof(Wall)).ToElementIds();
+				
+				XYZ orientation = new XYZ(wall.Orientation.X, wall.Orientation.Y, wall.Orientation.Z);
+				
+				TaskDialog.Show("", orientation.X + " "+ orientation.Y + " "+ orientation.Z);
+//				foreach (ElementId id in wallIds)
+//				{
+//					Element element = doc.GetElement(id);
+//					if (element is Wall)
+//					{
+//						Wall wall1 = element as Wall;
+//
+//						if (wall1 != null)
+//						{
+//							bool isFlip = wall1.Flipped;
+//							if (isFlip) {
+				////								wall1.Flip();
+//								double orientation_X = wall1.
+//							}
+//
+//							TaskDialog.Show("Result", isFlip.ToString());
+//						}
+//					}
+//					else
+//					{
+//						TaskDialog.Show("Revit", "Selected element is not a wall.");
+//					}
+//				}
+				
+				// Get the orientation of the wall
+//				string orientation = wall.;
+				
+				// Display the orientation
+//				TaskDialog.Show("Result", orientation);
+
+				transaction.Commit();
+			}
+		}
 	}
 }

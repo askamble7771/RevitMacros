@@ -156,7 +156,7 @@ namespace EnergyAnalysis
 				
 				FilteredElementIterator levelsIterator = (new FilteredElementCollector(doc)).OfClass(typeof(Level)).GetElementIterator();
 				FilteredElementIterator spacesIterator =(new FilteredElementCollector(doc)).WherePasses(new SpaceFilter()).GetElementIterator();
-				FilteredElementIterator zonesIterator = (new FilteredElementCollector(doc)).OfClass(typeof(Zone)).GetElementIterator();				
+				FilteredElementIterator zonesIterator = (new FilteredElementCollector(doc)).OfClass(typeof(Zone)).GetElementIterator();
 				
 				levelsIterator.Reset();
 				while (levelsIterator.MoveNext())
@@ -189,7 +189,7 @@ namespace EnergyAnalysis
 						zoneDictionary[zone.LevelId].Add(zone);
 					}
 				}
-								
+				
 				Level m_currentLevel = m_levels[0];
 				Parameter para = doc.ActiveView.get_Parameter(Autodesk.Revit.DB.BuiltInParameter.VIEW_PHASE);
 				Autodesk.Revit.DB.ElementId phaseId = para.AsElementId();
@@ -485,7 +485,7 @@ namespace EnergyAnalysis
 					{
 						Wall wall = element as Wall;
 						
-						if (wall.WallType.Name == "Exposed_Wall")
+						if (wall.WallType.Name.Contains("Exposed_Wall"))
 						{
 							//location curve of the wall
 							LocationCurve locationCurve = wall.Location as LocationCurve;
@@ -896,6 +896,56 @@ namespace EnergyAnalysis
 			}
 		}
 		
+		public void UpdateBuildinSchedule()
+		{
+			Document doc = this.ActiveUIDocument.Document;
+			
+			FilteredElementCollector buildingTypeCollector = new FilteredElementCollector(doc);
+			IList<Element> buildingTypeElementsList = buildingTypeCollector.OfCategory(BuiltInCategory.OST_HVAC_Load_Building_Types).ToList();
+			
+			FilteredElementCollector scheduleCollector = new FilteredElementCollector(doc);
+			IList<Element> hvacSheduleList = scheduleCollector.OfCategory(BuiltInCategory.OST_HVAC_Load_Schedules).ToList();
+//			IList<Element> hvacSheduleList = scheduleCollector.OfCategory(BuiltInCategory.OST_HVAC_).ToList();
+			
+			ElementId scheduleElementId = new ElementId(137396);
+			
+			using (Transaction transaction = new Transaction(doc))
+			{
+				transaction.Start("Update Schedules");
+				try
+				{
+					foreach(Element buildingTypeElement in buildingTypeElementsList)
+					{
+						HVACLoadType hvacLoadType = buildingTypeElement as HVACLoadType;
+						String loadTypeName = hvacLoadType.Name;
+						
+						if(hvacLoadType.Name == "Office")
+						{
+							IList<Parameter> orderParamList = buildingTypeElement.GetOrderedParameters();
+						
+							foreach(Parameter param in orderParamList)
+							{								
+								if(param.Definition.Name == "Occupancy Schedule")
+								{
+									//ForgeTypeId forgeTypeId = 
+									param.Set(scheduleElementId);
+									TaskDialog.Show("Parameter Name",param.AsValueString(), TaskDialogCommonButtons.Ok);
+								}
+							}
+						}	
+					}
+					
+					transaction.Commit();
+				}
+				catch (Exception ex)
+                {
+                    // Handle exceptions
+                    TaskDialog.Show("Error", ex.Message);
+                    transaction.RollBack();
+                }
+			}
+		}
+		
 		//It adds the equipment for the group spaces
 		public void GroupsSpacesEquipment()
 		{
@@ -1073,7 +1123,7 @@ namespace EnergyAnalysis
 				energyDataSetting.BuildingType  = gbXMLBuildingType.Gymnasium;
 				
 				
-				//Code for overriding the material properties 
+				//Code for overriding the material properties
 				ElementId id = EnergyDataSettings.GetBuildingConstructionSetElementId(doc);
 				MEPBuildingConstruction mep = doc.GetElement(id) as MEPBuildingConstruction;
 				mep.SetBuildingConstructionOverride(ConstructionType.ExteriorWindow, true);
@@ -1082,9 +1132,9 @@ namespace EnergyAnalysis
 
 //					mep.SetBuildingConstruction(ConstructionType.Floor, ConceptualConstructionWallType.LightweightConstructionNoInsulationInterior);
 //					mep.SetBuildingConstruction(ConstructionType.Floor, ConceptualConstructionWallType.LightweightConstructionNoInsulationInterior);
-					
-					/*The best overloaded method match for 'Autodesk.Revit.DB.Mechanical.MEPBuildingConstruction.SetBuildingConstruction(Autodesk.Revit.DB.Analysis.ConstructionType, Autodesk.Revit.DB.Construction)' has some invalid arguments (CS1502) - 
- * 						C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\EnergyAnalysis\Source\EnergyAnalysis\ThisApplication.cs:1084,6*/
+				
+				/*The best overloaded method match for 'Autodesk.Revit.DB.Mechanical.MEPBuildingConstruction.SetBuildingConstruction(Autodesk.Revit.DB.Analysis.ConstructionType, Autodesk.Revit.DB.Construction)' has some invalid arguments (CS1502) -
+				 * 						C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\EnergyAnalysis\Source\EnergyAnalysis\ThisApplication.cs:1084,6*/
 
 				EnergyAnalysisDetailModel eadm = EnergyAnalysisDetailModel.Create(doc, options);
 				
@@ -1111,5 +1161,235 @@ namespace EnergyAnalysis
 				trans.Commit();
 			}
 		}
+		
+		
+		public void GetView()
+		{
+//			View3D view3D;
+//			var document = RevitCommandData.Document;
+//			using (Transaction transaction = new Transaction(document,"Sample"))
+//			{
+//				transaction.Start();
+//
+//				var collector = new FilteredElementCollector(document);
+//				var list = collector.OfClass(typeof(ViewFamilyType)).Cast<ViewFamilyType>().
+//										First(v => v.ViewFamily == ViewFamily.ThreeDimensional);
+//
+//				view3D = View3D.CreateIsometric(document, list.Id);
+//				view3D.Name = "Sample 3D ";
+//
+//				transaction.Commit();
+//			}
+//
+//			RevitCommandData.UiDocument.ActiveView = view3D;
+		}
+		
+		
+		
+		public class RevitData
+		{
+			// Properties used in GetDataForAnalysis
+			public double AreaPerPerson { get; set; }
+			public double SensibleHeatGainPerPerson { get; set; }
+			public double LatentHeatGainPerPerson { get; set; }
+			public double LightingLoadDensity { get; set; }
+			public double PowerLoadDensity { get; set; }
+			public double OutdoorAirPerPerson { get; set; }
+			public double OutdoorAirPerArea { get; set; }
+			public double AirChangesPerHour { get; set; }
+			public string OpeningTime { get; set; }
+			public string ClosingTime { get; set; }
+			public double UnoccupiedCoolingSetPoint { get; set; }
+			public double HeatingSetPoint { get; set; }
+			public double CoolingSetPoint { get; set; }
+			public double HumidificationSetPoint { get; set; }
+			public double DehumidificationSetPoint { get; set; }
+
+			// Constructor (if needed)
+			public RevitData()
+			{
+				// Initialize properties if required
+			}
+		}
+
+		public class RevitHVACLoadBuildingType
+		{
+			// Properties used in GetDataForAnalysis
+			public double AreaPerPerson { get; set; }
+			public double SensibleHeatGainPerPerson { get; set; }
+			public double LatentHeatGainPerPerson { get; set; }
+			public double LightingLoadDensity { get; set; }
+			public double PowerLoadDensity { get; set; }
+			public double OutdoorAirPerPerson { get; set; }
+			public double OutdoorAirPerArea { get; set; }
+			public double HeatingSetPoint { get; set; }
+			public double CoolingSetPoint { get; set; }
+			public double HumidificationSetPoint { get; set; }
+			public double DehumidificationSetPoint { get; set; }
+
+			// Constructor (if needed)
+			public RevitHVACLoadBuildingType()
+			{
+				// Initialize properties if required
+			}
+		}
+
+		public class RevitConceptualConstructionType
+		{
+			// Properties used in GetDataForAnalysis
+			public Category Category { get; set; }
+			public string FamilyName { get; set; }
+			public Location Location { get; set; }
+			public string Name { get; set; }
+
+			// Constructor (if needed)
+			public RevitConceptualConstructionType()
+			{
+				// Initialize properties if required
+			}
+		}
+
+		public void GetDataForAnalysis()
+		{
+			Document _doc = this.ActiveUIDocument.Document;
+
+			IList<Element> buildingTypeCollector = new FilteredElementCollector(_doc).OfCategory(BuiltInCategory.OST_HVAC_Load_Building_Types).ToList();
+			List<RevitData> dataList = new List<RevitData>();
+
+			foreach (Element ele in buildingTypeCollector)
+			{
+				RevitData data = new RevitData();
+				HVACLoadBuildingType loadBuildingType = ele as HVACLoadBuildingType;
+
+				//Commented parameters below are not avaialable in the Revit API
+				data.AreaPerPerson = loadBuildingType.AreaPerPerson;
+				data.SensibleHeatGainPerPerson = loadBuildingType.SensibleHeatGainPerPerson;
+				data.LatentHeatGainPerPerson = loadBuildingType.LatentHeatGainPerPerson;
+				data.LightingLoadDensity = loadBuildingType.LightingLoadDensity;
+				data.PowerLoadDensity = loadBuildingType.PowerLoadDensity;
+				//Infiltration Airflow per area
+				//Plenum lighting contribution'
+				//Occupancy schedule
+				//Lighting Schedule
+				data.OutdoorAirPerPerson = loadBuildingType.OutdoorAirPerPerson;
+				data.OutdoorAirPerArea = loadBuildingType.OutdoorAirPerArea;
+				data.AirChangesPerHour = loadBuildingType.AirChangesPerHour;
+				//Outdoor Air Method
+				data.OpeningTime = loadBuildingType.OpeningTime;
+				data.ClosingTime = loadBuildingType.ClosingTime;
+				data.UnoccupiedCoolingSetPoint = loadBuildingType.UnoccupiedCoolingSetPoint;
+				data.HeatingSetPoint = loadBuildingType.HeatingSetPoint;
+				data.CoolingSetPoint = loadBuildingType.CoolingSetPoint;
+				data.HumidificationSetPoint = loadBuildingType.HumidificationSetPoint;
+				data.DehumidificationSetPoint = loadBuildingType.DehumidificationSetPoint;
+
+				dataList.Add(data);
+			}
+
+			IList<Element> spaceTypeCollector = new FilteredElementCollector(_doc).OfCategory(BuiltInCategory.OST_HVAC_Load_Space_Types).ToList();
+			List<RevitHVACLoadBuildingType> hvacLoadSpaceType = new List<RevitHVACLoadBuildingType>();
+
+			foreach (Element ele in spaceTypeCollector)
+			{
+				RevitHVACLoadBuildingType revitLoadSpaceType = new RevitHVACLoadBuildingType();
+				HVACLoadSpaceType loadSpaceType = ele as HVACLoadSpaceType;
+
+				//Commented parameters below are not avaialable in the Revit API
+				revitLoadSpaceType.AreaPerPerson = loadSpaceType.AreaPerPerson;
+				revitLoadSpaceType.SensibleHeatGainPerPerson = loadSpaceType.SensibleHeatGainPerPerson;
+				revitLoadSpaceType.LatentHeatGainPerPerson = loadSpaceType.LatentHeatGainPerPerson;
+				revitLoadSpaceType.LightingLoadDensity = loadSpaceType.LightingLoadDensity;
+				revitLoadSpaceType.PowerLoadDensity = loadSpaceType.PowerLoadDensity;
+				//Infiltration Airflow per area
+				//Plenum lighting contribution
+				//Occupancy schedule
+				//Lighting Schedule
+				revitLoadSpaceType.OutdoorAirPerPerson = loadSpaceType.OutdoorAirPerPerson;
+				revitLoadSpaceType.OutdoorAirPerArea = loadSpaceType.OutdoorAirPerArea;
+				//AirChangesPerHour
+				//Outdoor Air Method
+				revitLoadSpaceType.HeatingSetPoint = loadSpaceType.HeatingSetPoint;
+				revitLoadSpaceType.CoolingSetPoint = loadSpaceType.CoolingSetPoint;
+				revitLoadSpaceType.HumidificationSetPoint = loadSpaceType.HumidificationSetPoint;
+				revitLoadSpaceType.DehumidificationSetPoint = loadSpaceType.DehumidificationSetPoint;
+
+				hvacLoadSpaceType.Add(revitLoadSpaceType);
+			}
+
+			IList<Element> conceptualConstructionTypeCollector = new FilteredElementCollector(_doc).OfClass(typeof(ConceptualConstructionType)).ToList();
+			List<RevitConceptualConstructionType> conceptualConstructionType = new List<RevitConceptualConstructionType>();
+
+			foreach (Element ele in conceptualConstructionTypeCollector)
+			{
+				RevitConceptualConstructionType revitConceptualConstructionType = new RevitConceptualConstructionType();
+				ConceptualConstructionType hvBt = ele as ConceptualConstructionType;
+
+				// Populate RevitConceptualConstructionType properties from ConceptualConstructionType
+				revitConceptualConstructionType.Category = hvBt.Category;
+				revitConceptualConstructionType.FamilyName = hvBt.FamilyName;
+				revitConceptualConstructionType.Location = hvBt.Location;
+				revitConceptualConstructionType.Name = hvBt.Name;
+
+				conceptualConstructionType.Add(revitConceptualConstructionType);
+			}
+
+
+			IList<Element> windowTypes = new FilteredElementCollector(_doc).OfCategory(BuiltInCategory.OST_MassGlazingAll).ToList();
+			foreach(Element ele in windowTypes)
+			{
+				
+			}
+			
+			IList<Element> massTypeCollector = new FilteredElementCollector(_doc).OfCategory(BuiltInCategory.OST_Mass).ToList();
+			foreach(Element ele in massTypeCollector)
+			{
+				//string name = ele.Name;
+				//ConceptualConstructionType hvBt = ele as ConceptualConstructionType;
+				//string conceptualConstructionTypeName = hvBt.FamilyName;
+			}
+			
+			ElementId id = EnergyDataSettings.GetBuildingConstructionSetElementId(_doc);
+			MEPBuildingConstruction mep = _doc.GetElement(id) as MEPBuildingConstruction;
+			List<ConstructionType> constructionTypeList = new List<ConstructionType>();
+			Dictionary<string, List<string>> constructionTypeDict = new Dictionary<string, List<string>>();
+			
+			
+			constructionTypeList.Add(ConstructionType.Ceiling);
+			constructionTypeList.Add(ConstructionType.Door);
+			constructionTypeList.Add(ConstructionType.ExteriorWall);
+			constructionTypeList.Add(ConstructionType.ExteriorWindow);
+			constructionTypeList.Add(ConstructionType.Floor);
+			constructionTypeList.Add(ConstructionType.InteriorWall);
+			constructionTypeList.Add(ConstructionType.InteriorWindow);
+			constructionTypeList.Add(ConstructionType.Roof);
+			constructionTypeList.Add(ConstructionType.Skylight);
+			constructionTypeList.Add(ConstructionType.Slab);
+			constructionTypeList.Add(ConstructionType.UndergroundWall);
+			try {
+				for (int i = 0; i < constructionTypeList.Count; i++)
+				{
+					ICollection<Construction> constructions = mep.GetConstructions(constructionTypeList[i]);
+					List<string> constructionNames = new List<string>();
+					
+					foreach(Construction construction in constructions)
+					{
+						constructionNames.Add(construction.Name);
+					}
+					string constructionTypeName = constructionTypeList[i].ToString();
+					constructionTypeDict.Add(constructionTypeName, constructionNames);
+				}
+			} catch (Exception e) {
+				TaskDialog.Show("Exception", e.Message);
+			}
+			
+			
+			
+			
+			for (int i = 0; i < 5; i++) {
+				
+			}
+			
+		}
+		
 	}
 }

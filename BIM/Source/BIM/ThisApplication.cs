@@ -53,8 +53,7 @@ namespace BIM
 			using (Transaction trans = new Transaction(doc, "wallCreation"))
 			{
 				trans.Start("Creating wall in Revit");
-				//              int count = 0;
-
+				
 				string fileName = "E:\\building.json";
 				StreamReader streamReader = new StreamReader(fileName);
 				string json = streamReader.ReadToEnd();
@@ -137,13 +136,13 @@ namespace BIM
 				XYZ location = new XYZ(0, 0, 0);
 				
 				//if condition is for wall is horizontal and else if for wall is vertical
-				if ((x1 < x2 && y1 == y2) || (x2 < x1 && y1 == y2))
+				if ((x1 < x2 && y1 == y2) || (x2 < x1 && y1 == y2))//(x1-x2 < 0.1) (y1 - y2 > 1)
 				{
-					location = new XYZ(x1 + offset * (lineLength / 20), y1, z + layerAltitude);
+					location = new XYZ(x1 + offset * (lineLength), y1, z + layerAltitude);
 				}
 				else if ((y1 < y2 && x1 == x2) || (y2 < y1 && x1 == x2))
 				{
-					location = new XYZ(x1, y1 + offset * (lineLength / 20), z + layerAltitude);
+					location = new XYZ(x1, y1 + offset * (lineLength), z + layerAltitude);
 				}
 
 				//Check whether the hole is Window or Door
@@ -257,6 +256,5 @@ namespace BIM
 			
 			return null;
 		}
-		
 	}
 }

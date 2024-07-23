@@ -1,0 +1,5 @@
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\CreateJson\AddIn\CreateJson.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\CreateJson\AddIn\CreateJson.pdb
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\CreateJson\Source\CreateJson\obj\Debug\CreateJson.csprojResolveAssemblyReference.cache
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\CreateJson\Source\CreateJson\obj\Debug\CreateJson.dll
+C:\ProgramData\Autodesk\Revit\Macros\2024\Revit\AppHookup\CreateJson\Source\CreateJson\obj\Debug\CreateJson.pdb
